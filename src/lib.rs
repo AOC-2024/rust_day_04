@@ -6,6 +6,40 @@ pub fn find_xmas(input_path: &str) -> u32 {
     search_xmas(input)
 }
 
+pub fn find_xmas_shapes(input_path: &str) -> u32 {
+    let input = read_input(&input_path);
+
+    search_xmas_shapes(input)
+}
+
+fn search_xmas_shapes(input: Vec<Vec<char>>) -> u32 {
+    if input.is_empty() {
+        return 0;
+    }
+
+    let rows = input.len();
+    let cols = input[0].len();
+    let mut xmas_count = 0;
+
+    for r in 0..rows {
+        for c in 0..cols {
+            if r + 1 < rows && r > 0 && c + 1 < cols && c > 0 {
+                if input[r][c] == 'A' {
+                    let first_diagonal = vec![input[r - 1][c - 1], input[r + 1][c + 1]];
+                    let second_diagonal = vec![input[r - 1][c + 1], input[r + 1][c -1]];
+                    if first_diagonal.iter().filter(|value| **value == 'M').count() == 1 && first_diagonal.iter().filter(|value| **value == 'S').count() == 1 
+                        && second_diagonal.iter().filter(|value| **value == 'M').count() == 1 && second_diagonal.iter().filter(|value| **value == 'S').count() == 1 {
+                    xmas_count += 1;
+                }
+            }
+        }
+
+    }
+}
+
+    xmas_count
+}
+
 fn search_xmas(input: Vec<Vec<char>>) -> u32 {
     if input.is_empty() {
         return 0;
@@ -80,6 +114,51 @@ fn read_input(input_path: &str) -> Vec<Vec<char>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn should_find_2_xmas_shapes_reversed_and_not_reversed() {
+        assert_eq!(
+            search_xmas_shapes(vec![
+                vec!['M', 'O', 'M', 'O', 'S'],
+                vec!['O', 'A', 'O', 'A', 'O'],
+                vec!['S', 'O', 'S', 'O', 'M'],
+                vec!['O', 'A', 'O', 'O', 'S'],
+                vec!['M', 'O', 'M', 'O', 'M']
+            ]),
+            2
+        );
+    }
+
+    #[test]
+    fn should_find_1_xmas_shape_reversed() {
+        assert_eq!(
+            search_xmas_shapes(vec![
+                vec!['S', 'O', 'S', 'O'],
+                vec!['O', 'A', 'O', 'O'],
+                vec!['M', 'O', 'M', 'O'],
+                vec!['O', 'O', 'O', 'S']
+            ]),
+            1
+        );
+    }
+
+    #[test]
+    fn should_find_1_xmas_shape() {
+        assert_eq!(
+            search_xmas_shapes(vec![
+                vec!['M', 'O', 'S', 'O'],
+                vec!['O', 'A', 'O', 'O'],
+                vec!['M', 'O', 'S', 'O'],
+                vec!['O', 'O', 'O', 'S']
+            ]),
+            1
+        );
+    }
+
+    #[test]
+    fn should_find_0_xmas_shapes_when_empty() {
+        assert_eq!(search_xmas_shapes(Vec::new()), 0);
+    }
 
     #[test]
     fn should_find_1_xmas_diagonal() {
